@@ -1,20 +1,20 @@
-#include"position.h"
-#include"room.h"
-#include"tree.h"
-#include"Game.h"
+#include "Position.h"
+#include "Room.h"
+#include "Tree.h"
+#include "Game.h"
+#include<iostream>
 
 int main()
-{   
+{
+    
     std::string filePath;
-    std::cout<<"Please, enter filePath: ";
-    std::cin>>filePath; 
-
-    int numOfLeaf;
-    std::cout<<"Please, enter numOfLeaf: ";
-    std::cin>>numOfLeaf;
-
+    std::cout<<"Please, enter file path: ";
+    std::cin>>filePath;
+    
     Game game(filePath);
-    game.print(numOfLeaf);
+    game.start();   
+
+
   
     return 0;
 }
