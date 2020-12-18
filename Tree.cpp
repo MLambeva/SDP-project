@@ -216,9 +216,9 @@ void Tree::findPathOnLeafWithIdHelper(Node* curr, const int& id, std::string& pa
 //Creates tree from all paths
 void Tree::addAllPaths(std::vector<std::string> paths)
 {
-    for(int i = 0;i<paths.size();i++)
+    for(std::string path : paths)
     {
-        addOnePath(paths[i]);
+        addOnePath(path);
     }
 }
 

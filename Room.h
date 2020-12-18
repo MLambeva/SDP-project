@@ -15,11 +15,16 @@ class Room
     Position Tom;
     std::vector<std::string> possiblePaths;
 
-    //Function for putting position of Tom and Jerry
-    void putHeroPosition(Position& other, char x, const std::string& error, std::ifstream& input);
+    //Function that checks if we can place Tom, Jerry or furniture in the position set by the text file 
+    bool canBeLocated(const Position& other) const;
+    
     void resizeRoom(std::ifstream& input);
+
+    //Function for putting position of Tom and Jerry
+    void putCharactersPosition(Position& other, char x, const std::string& error, std::ifstream& input);
     void putJerryPosition(std::ifstream& input);
     void putTomPosition(std::ifstream& input);
+
     void putFurniture(int K, std::ifstream& input);
     void placesForPaintSpill(int L, std::ifstream& input);
     void createPossiblePathsHelper(const Position& curr, std::string& path);

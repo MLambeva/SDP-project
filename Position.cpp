@@ -32,6 +32,13 @@ Position& Position::operator=(const Position& other)
     return *this;
 }
 
+Position& Position::changePos(int _x, int _y)
+{
+    x = _x;
+    y = _y;
+    return *this;
+}
+
 void Position::read(std::ifstream& input)
 {    
     if (input.fail())

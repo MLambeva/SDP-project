@@ -5,16 +5,9 @@
 #include<iostream>
 
 int main()
-{
-    
-    std::string filePath;
-    std::cout<<"Please, enter file path: ";
-    std::cin>>filePath;
-    
-    Game game(filePath);
+{   
+    Game game;
     game.start();   
 
-
-  
     return 0;
 }
