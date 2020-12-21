@@ -22,16 +22,17 @@ class Tree
     
     //Helper functions for adding string to tree
     //According to direction symbol, function returns a pointer to next direction
-    static Node*& findNextPosition(char x, Node*& curr);
+    Node*& findNextPosition(char x, Node*& curr);
     //Creates next part of tree
-    static void helper(char x, Node*& curr);
+    void helper(char x, Node*& curr);
     //Creates the tail of tree
     void createTailTree(std::string& path);
     //Creates tree from one string
     void addOnePath(std::string path);
 
+    void makeLegend(std::ostream& out) const;
     //Tree visualization
-    void toGvHelper (std::ostream& out, Node *curr, bool flag) const; 
+    void toGvHelper (std::ostream& out, Node *curr) const; 
 
     //Checks if the pointer points to leaf
     bool isLeaf(Node* curr) const;

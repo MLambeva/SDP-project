@@ -85,23 +85,49 @@ void Tree::addOnePath(std::string path)
     }   
 }
 
+void Tree::makeLegend(std::ostream& out) const
+{
+    out << "rankdir=TB \nsubgraph cluster_01 \n { \n node [shape=plaintext] \n label=\"Legend:\";\n { \n rankdir = LR \n rank = same\n"
+        "key [label=<<table  border=\"0\" cellpadding=\"2\" cellspacing=\"0\" cellborder=\"0\">\n"
+            "<tr><td align=\"right\" port=\"north\">North</td></tr>\n"
+            "<tr><td align=\"right\" port=\"east\">East</td></tr>\n"
+            "<tr><td align=\"right\" port=\"south\">South</td></tr>\n"
+            "<tr><td align=\"righ\" port=\"west\">West</td></tr>\n"
+            "<tr><td align=\"right\" port=\"paint\">Paint</td></tr>\n"
+            "</table>>]\n"
+        "key2 [label=<<table  border=\"0\" cellpadding=\"2\" cellspacing=\"0\" cellborder=\"0\">\n"
+            "<tr><td port=\"north\">&nbsp;</td></tr>\n"
+            "<tr><td port=\"east\">&nbsp;</td></tr>\n"
+            "<tr><td port=\"south\">&nbsp;</td></tr>\n"
+            "<tr><td port=\"west\">&nbsp;</td></tr>\n"
+            "<tr><td port=\"paint\">&nbsp;</td></tr>\n"
+            "</table>>]\n"
+        "key:north:e -> key2:north:w [color=red]\n"
+        "key:east:e -> key2:east:w [color=orange]\n"
+        "key:south:e -> key2:south:w [color=green]\n"
+        "key:west:e -> key2:west:w [color=blue]\n"
+        "key:paint:e -> key2:paint:w [color=black]\n" 
+    "}\n}\n";
+}
+
 //Tree visualization
-void Tree::toGvHelper (std::ostream& out, Node *curr, bool flag) const
+void Tree::toGvHelper (std::ostream& out, Node *curr) const
 {
     if (curr)
     {     
-        if(flag)
+        if (curr == start)
         {
-            out << (long)curr << "[label=\"" << "Start" << "\"];\n";
-        }
-        else if(isLeaf(curr))
-        {
-            out << (long)curr << "[label=\"" << curr->data << "\", xlabel=\"" << curr->idLeaf << "\"];\n";
+            out << (long)curr << "[label=<<B>Start</B>>];\n";
         }
         else
         {
-            out << (long)curr << "[label=\"" << curr->data << "\"];\n";
-        }      
+            out << (long)curr << "[label=<<B>" << curr->data << "</B>>";
+            if (isLeaf(curr))
+            {
+                out << ", xlabel=<<B>" << curr->idLeaf << "</B>>";
+            }
+            out << "];\n";
+        }     
         
         if (curr->north)
         {
@@ -124,11 +150,11 @@ void Tree::toGvHelper (std::ostream& out, Node *curr, bool flag) const
             out << (long)curr << "->" << (long)(curr->paint) << "[color=black];\n";
         } 
     
-        toGvHelper (out, curr->north, false);
-        toGvHelper (out, curr->east, false);
-        toGvHelper (out, curr->south, false);
-        toGvHelper (out, curr->west, false);
-        toGvHelper (out, curr->paint, false);
+        toGvHelper (out, curr->north);
+        toGvHelper (out, curr->east);
+        toGvHelper (out, curr->south);
+        toGvHelper (out, curr->west);
+        toGvHelper (out, curr->paint);
     }
 }
 
@@ -226,7 +252,8 @@ void Tree::addAllPaths(std::vector<std::string> paths)
 void Tree::toGv(std::ostream& out)
 {
     out << "digraph G{\n";
-    toGvHelper(out, start, true);     
+    makeLegend(out);
+    toGvHelper(out, start);     
     out << "}";
 }
 
@@ -246,10 +273,6 @@ void Tree::createIdToLeaves()
 //According to a given identifier 'id', function returns string that is path from root to a leaf with this 'id'
 std::string Tree::findPathOnLeafWithId(const int& id)
 {
-    if(id < 0 || id >= countLeaves())
-    {
-        throw std::runtime_error ("Incorrect id!");
-    }
     std::string path;
     findPathOnLeafWithIdHelper(start, id, path);
     return path;

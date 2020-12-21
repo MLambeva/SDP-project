@@ -43,7 +43,7 @@ void Position::read(std::ifstream& input)
 {    
     if (input.fail())
     {
-	    std::cout << "Error!\n";
+	    throw std::runtime_error("Input file failed!");
     }
     input >> x;
     input >> y;

@@ -9,7 +9,7 @@ struct Position
     int x;
     int y;
 
-    Position() = default;
+    //Position() = default;
 
     Position north()const;
     Position south()const;

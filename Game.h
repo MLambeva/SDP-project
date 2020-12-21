@@ -4,6 +4,7 @@
 #include"Tree.h"
 #include"Position.h"
 #include<iostream>
+#include<limits>
 
 class Game
 {

@@ -169,8 +169,16 @@ void Game::visualize()
 void Game::mainFunctionalities()
 {
     int id;
-    std::cout << "Please, enter number of leaf: ";
-    std::cin >> id;
+    do
+    {
+        while (std::cout << "Please, enter number of leaf: " && !(std::cin >> id))
+        {
+            std::cin.clear(); //clear bad input flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); //discard input
+            std::cout << "Invalid input, please re-enter!\n";
+        }
+    } while (id < 0 || id >= droneWithShortestPaths.countLeaves());    
+    
     std::cout << "Commands which have to be entered in the drone: "<< droneWithShortestPaths.findPathOnLeafWithId(id) << '\n';
     std::cout << "Length of path: " << lengthOfChosenPath(droneWithShortestPaths.findPathOnLeafWithId(id)) << '\n';
     std::cout << "Amount of paint spilled: " << quantityPaintSpill(droneWithShortestPaths.findPathOnLeafWithId(id)) << '\n';

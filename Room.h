@@ -8,7 +8,6 @@
 
 class Room
 {
-    ///////Validaciq
     private:
     std::vector<std::vector<char>> room;
     Position Jerry;
