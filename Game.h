@@ -40,8 +40,6 @@ class Game
     void additionallyFunctionalities();
     
     public:
-    Game() = default;   
-
     //main function demonstrating all functionalities
     void start();
 };

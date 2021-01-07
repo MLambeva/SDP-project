@@ -141,6 +141,16 @@ bool Room::canStepOn(const Position& other) const
             !isCorrectSymbol(other, 'V');
 }
 
+void Room::actionAfterCanStepOn(const Position& curr, char x, std::string path)
+{
+    if(canStepOn(curr))
+    {
+        path.push_back(x);
+        createPossiblePathsHelper(curr, path);
+        path.pop_back();
+    }
+}
+
 void Room::createPossiblePathsHelper(const Position& curr, std::string& path)
 {    
     bool isP = false;
@@ -160,30 +170,11 @@ void Room::createPossiblePathsHelper(const Position& curr, std::string& path)
     }
     setElemInCurrPosition(curr, 'V');
     
-    if(canStepOn(curr.north()))
-    {
-        path.push_back('N');
-        createPossiblePathsHelper(curr.north(), path);
-        path.pop_back();
-    }
-    if(canStepOn(curr.east()))
-    {
-        path.push_back('E');
-        createPossiblePathsHelper(curr.east(), path);
-        path.pop_back();
-    }
-    if(canStepOn(curr.south()))
-    {
-        path.push_back('S');
-        createPossiblePathsHelper(curr.south(), path);
-        path.pop_back();
-    }   
-    if(canStepOn(curr.west()))
-    {
-        path.push_back('W');
-        createPossiblePathsHelper(curr.west(), path);
-        path.pop_back();
-    }
+    actionAfterCanStepOn(curr.north(), 'N', path);
+    actionAfterCanStepOn(curr.east(), 'E', path);
+    actionAfterCanStepOn(curr.south(), 'S', path);
+    actionAfterCanStepOn(curr.west(), 'W', path);
+
     if (isP) 
     {
         path.pop_back();
@@ -199,7 +190,6 @@ void Room::createPossiblePathsHelper(const Position& curr, std::string& path)
 int Room::lengthPath(std::string path) const
 {
     int length = 0;
-    //for(int i=0;i<path.size();i++)
     for(char elem : path)
     {
         if(elem != 'P')
@@ -217,7 +207,6 @@ int Room::lengthShortestPath() const
     if(!possiblePaths.empty())
     {
         helper = lengthPath(possiblePaths[0]);
-        //for(int i=1;i<possiblePaths.size();i++)
         for(std::string posPath : possiblePaths)
         {
             if(lengthPath(posPath) < helper)
@@ -227,21 +216,6 @@ int Room::lengthShortestPath() const
         }
     }
     return helper;
-}
-
-std::vector<std::vector<char>> Room::getRoom() const
-{
-    return this->room;
-}
-
-Position Room::getJerry() const
-{
-    return this->Jerry;
-}
-
-Position Room::getTom() const
-{
-    return this->Tom;
 }
 
 std::vector<std::string> Room::getPossiblePaths() const

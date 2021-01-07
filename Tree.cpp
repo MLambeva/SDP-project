@@ -1,6 +1,17 @@
 #include "Tree.h"
 
-Tree::Tree():start(nullptr){}
+void Tree::clearHelper(Node* curr)
+{
+    if(curr)
+    {
+        clearHelper(curr->north);
+        clearHelper(curr->east);
+        clearHelper(curr->south);
+        clearHelper(curr->west);
+        clearHelper(curr->paint);
+        delete curr;
+    }
+}
 
 //According to direction symbol, function returns a pointer to next direction
 Tree::Node*& Tree::findNextPosition(char x, Node*& curr) 
@@ -24,7 +35,7 @@ Tree::Node*& Tree::findNextPosition(char x, Node*& curr)
 }
 
 //Creates next part of tree
-void Tree::helper(char x, Node*& curr)
+void Tree::createNextNode(char x, Node*& curr)
 {  
     Node*& next = findNextPosition(x, curr);
     if(!next)
@@ -42,23 +53,23 @@ void Tree::createTailTree(std::string& path)
     {
         if(path.front() == 'N')
         {
-            helper('N', curr);
+            createNextNode('N', curr);
         }
         else if(path.front() == 'E')
         {
-            helper('E', curr);
+            createNextNode('E', curr);
         }
         else if(path.front() == 'S')
         {
-            helper('S', curr);
+            createNextNode('S', curr);
         }
         else if(path.front() == 'W')
         {
-            helper('W', curr);
+            createNextNode('W', curr);
         }
         else if(path.front() == 'P')
         {
-            helper('P', curr);
+            createNextNode('P', curr);
         }
         else
         {
@@ -87,7 +98,7 @@ void Tree::addOnePath(std::string path)
 
 void Tree::makeLegend(std::ostream& out) const
 {
-    out << "rankdir=TB \nsubgraph cluster_01 \n { \n node [shape=plaintext] \n label=\"Legend:\";\n { \n rankdir = LR \n rank = same\n"
+    out << "rankdir=TB \nsubgraph cluster_01 \n { \n node [shape=plaintext] \n label=<<B>Legend:</B>>;\n { \n rankdir = LR \n rank = same\n"
         "key [label=<<table  border=\"0\" cellpadding=\"2\" cellspacing=\"0\" cellborder=\"0\">\n"
             "<tr><td align=\"right\" port=\"north\">North</td></tr>\n"
             "<tr><td align=\"right\" port=\"east\">East</td></tr>\n"
@@ -110,6 +121,15 @@ void Tree::makeLegend(std::ostream& out) const
     "}\n}\n";
 }
 
+//print direction
+void Tree::removeRepeats (std::ostream& out, Node* pos, Node* direction, std::string color) const
+{
+    if (direction)
+    {
+        out << (long)pos << "->" << (long)direction << "[color=" << color << "];\n";
+    }   
+}
+
 //Tree visualization
 void Tree::toGvHelper (std::ostream& out, Node *curr) const
 {
@@ -124,31 +144,16 @@ void Tree::toGvHelper (std::ostream& out, Node *curr) const
             out << (long)curr << "[label=<<B>" << curr->data << "</B>>";
             if (isLeaf(curr))
             {
-                out << ", xlabel=<<B>" << curr->idLeaf << "</B>>";
+                out << ", xlabel=<<B><font color = \"#416D49\">" << curr->idLeaf << "</font></B>>";
             }
             out << "];\n";
         }     
         
-        if (curr->north)
-        {
-            out << (long)curr << "->" << (long)(curr->north) << "[color=red];\n";
-        } 
-        if (curr->east)
-        {
-            out << (long)curr << "->" << (long)(curr->east) << "[color=orange];\n";
-        }
-        if (curr->south)
-        {
-            out << (long)curr << "->" << (long)(curr->south) << "[color=green];\n";
-        } 
-        if (curr->west)
-        {
-            out << (long)curr << "->" << (long)(curr->west) << "[color=blue];\n";
-        }
-        if (curr->paint)
-        {
-            out << (long)curr << "->" << (long)(curr->paint) << "[color=black];\n";
-        } 
+        removeRepeats(out, curr, curr->north, "red");
+        removeRepeats(out, curr, curr->east, "orange");
+        removeRepeats(out, curr, curr->south, "green");
+        removeRepeats(out, curr, curr->west, "blue");
+        removeRepeats(out, curr, curr->paint, "black");
     
         toGvHelper (out, curr->north);
         toGvHelper (out, curr->east);
@@ -237,6 +242,13 @@ void Tree::findPathOnLeafWithIdHelper(Node* curr, const int& id, std::string& pa
     findPathOnLeafWithIdHelper(curr->south, id, path);
     findPathOnLeafWithIdHelper(curr->west, id, path);
     findPathOnLeafWithIdHelper(curr->paint, id, path);
+}
+
+Tree::Tree():start(nullptr){}
+
+Tree::~Tree()
+{
+    clearHelper(start);
 }
 
 //Creates tree from all paths

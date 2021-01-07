@@ -142,6 +142,24 @@ std::vector<std::string> Game::pathsWithMaxPaintSpillAndLeastTurns() const
     return result;
 }
 
+std::vector<std::string> Game::pathsWithMaxPaintSpillAndLeastTurns() const
+{
+    std::vector<std::string> result;
+    std::vector<std::string> curr = pathsWithMostPaintSpill();
+    if(!curr.empty())
+    {
+        int min = minTurns(curr);
+        for(std::string elem : curr)
+        {
+            if(countTurns(elem) == min)
+            {
+                result.push_back(elem);
+            }
+        }
+    }
+    return result;
+}
+
 void Game::createRoomAndDrone()
 {
     std::string filePath;

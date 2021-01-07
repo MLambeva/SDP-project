@@ -26,6 +26,8 @@ class Room
 
     void putFurniture(int K, std::ifstream& input);
     void placesForPaintSpill(int L, std::ifstream& input);
+    //function for removing repeats
+    void actionAfterCanStepOn(const Position& curr, char x, std::string path);
     void createPossiblePathsHelper(const Position& curr, std::string& path);
 
     //Places 'x' in the room on position 'curr'
@@ -40,11 +42,6 @@ class Room
     int lengthShortestPath() const;
 
     public:
-    Room() = default;
-    
-    std::vector<std::vector<char>> getRoom() const;
-    Position getJerry() const;
-    Position getTom() const; 
     std::vector<std::string> getPossiblePaths() const;
 
     //Creates the room with information from a text file 

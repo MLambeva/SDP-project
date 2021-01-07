@@ -20,17 +20,19 @@ class Tree
     };
     Node* start;
     
+    void clearHelper(Node* curr);
     //Helper functions for adding string to tree
     //According to direction symbol, function returns a pointer to next direction
     Node*& findNextPosition(char x, Node*& curr);
     //Creates next part of tree
-    void helper(char x, Node*& curr);
+    void createNextNode(char x, Node*& curr);
     //Creates the tail of tree
     void createTailTree(std::string& path);
     //Creates tree from one string
     void addOnePath(std::string path);
 
     void makeLegend(std::ostream& out) const;
+    void removeRepeats (std::ostream& out, Node* pos, Node* direction, std::string color) const;
     //Tree visualization
     void toGvHelper (std::ostream& out, Node *curr) const; 
 
@@ -47,6 +49,7 @@ class Tree
 
     public:
     Tree();
+    ~Tree();
     
     //Creates tree from all paths
     void addAllPaths(std::vector<std::string> paths);
