@@ -70,13 +70,13 @@ int Game::countTurns(std::string path) const
 }
 
 //Returns the maximum amount of spilled paint
-int Game::maxPaintSpill() const
+int Game::maxPaintSpill(std::vector<std::string> paths) const
 {
     int max = 0;
-    if(!room.getPossiblePaths().empty())
+    if(!paths.empty())
     {
-        max = quantityPaintSpill(room.getPossiblePaths()[0]);
-        for(std::string posPath : room.getPossiblePaths())
+        max = quantityPaintSpill(paths[0]);
+        for(std::string posPath : paths)
         {
             if(quantityPaintSpill(posPath) > max)
             {
@@ -91,7 +91,7 @@ int Game::maxPaintSpill() const
 std::vector<std::string> Game::pathsWithMostPaintSpill() const
 {
     std::vector<std::string> saver;
-    int max = maxPaintSpill();
+    int max = maxPaintSpill(room.getPossiblePaths());
     if(max)
     {
         for(std::string posPath : room.getPossiblePaths())
@@ -142,16 +142,34 @@ std::vector<std::string> Game::pathsWithMaxPaintSpillAndLeastTurns() const
     return result;
 }
 
-std::vector<std::string> Game::pathsWithMaxPaintSpillAndLeastTurns() const
+int Game::lengthShortestPath(std::vector<std::string> paths) const
+{
+    int min = 0;
+    if(!paths.empty())
+    {
+        min = lengthOfChosenPath(paths[0]);
+        for(std::string elem : paths)
+        {
+            if(lengthOfChosenPath(elem) < min)
+            {
+                min = lengthOfChosenPath(elem);
+            }
+        }
+    }
+    return min;
+}
+
+//Returns all fastest paths with maximum amount of spilled paint Tom should make to reach Jerry
+std::vector<std::string> Game::fastestPathWithMostPaintSpill() const
 {
     std::vector<std::string> result;
-    std::vector<std::string> curr = pathsWithMostPaintSpill();
+    std::vector<std::string> curr = room.createShortestPossiblePaths();
     if(!curr.empty())
     {
-        int min = minTurns(curr);
+        int max = maxPaintSpill(curr);
         for(std::string elem : curr)
         {
-            if(countTurns(elem) == min)
+            if(quantityPaintSpill(elem) == max)
             {
                 result.push_back(elem);
             }
@@ -162,10 +180,23 @@ std::vector<std::string> Game::pathsWithMaxPaintSpillAndLeastTurns() const
 
 void Game::createRoomAndDrone()
 {
-    std::string filePath;
-    std::cout << "Please, enter file name: ";
-    std::cin >> filePath;
-    room.createRoom(filePath + ".txt");
+    bool flag = true;
+    std::string filePath;   
+    do
+    {
+        try
+        {
+            std::cout << "Please, enter file name: ";
+            std::cin >> filePath;
+            room.createRoom(filePath + ".txt");
+            flag = false;
+        }
+        catch(const std::runtime_error& e)
+        {
+            std::cout << e.what() << '\n';
+        }
+    } while (flag);  
+
     droneWithAllPaths.addAllPaths(room.createAllPossiblePaths());
     droneWithShortestPaths.addAllPaths(room.createShortestPossiblePaths());   
     droneWithAllPaths.createIdToLeaves();
@@ -186,7 +217,7 @@ void Game::visualize()
 
 void Game::mainFunctionalities()
 {
-    int id;
+    int id;   
     do
     {
         while (std::cout << "Please, enter number of leaf: " && !(std::cin >> id))
@@ -197,13 +228,13 @@ void Game::mainFunctionalities()
         }
     } while (id < 0 || id >= droneWithShortestPaths.countLeaves());    
     
-    std::cout << "Commands which have to be entered in the drone: "<< droneWithShortestPaths.findPathOnLeafWithId(id) << '\n';
+    std::cout << "\nCommands which have to be entered in the drone: "<< droneWithShortestPaths.findPathOnLeafWithId(id) << '\n';
     std::cout << "Length of path: " << lengthOfChosenPath(droneWithShortestPaths.findPathOnLeafWithId(id)) << '\n';
     std::cout << "Amount of paint spilled: " << quantityPaintSpill(droneWithShortestPaths.findPathOnLeafWithId(id)) << '\n';
     std::cout << "Number of turns: " << countTurns(droneWithShortestPaths.findPathOnLeafWithId(id)) << "\n\n";
 }
 
-void Game::additionallyFunctionalities()
+void Game::firstAdditionallyFunctionalities() const
 {
     std::vector<std::string> maxPaintMinTurns = pathsWithMaxPaintSpillAndLeastTurns();
     if(!maxPaintMinTurns.empty())
@@ -211,7 +242,8 @@ void Game::additionallyFunctionalities()
         std::cout<<"Paths with the most paint spill and the least turns: ";
         for(std::string maxElem : maxPaintMinTurns)
         {
-            std::cout << maxElem <<"   ";
+            print(maxElem);
+            std::cout<< "    ";
         }
         std::cout << '\n';
     }
@@ -221,18 +253,47 @@ void Game::additionallyFunctionalities()
     }       
 }
 
+void Game::secondAdditionallyFunctionalities() const
+{
+    std::vector<std::string> maxPaintShortestPath = fastestPathWithMostPaintSpill();
+    if(!maxPaintShortestPath.empty())
+    {
+        std::cout<<"The shortest path with the most paint spill: ";
+        for(std::string elem : maxPaintShortestPath)
+        {
+            print(elem);
+            std::cout<< "    ";
+        }
+        std::cout << '\n';
+    }
+    else
+    {
+        std::cout << "There are no roads in which there is paint spill!";
+    }       
+}
+
+void Game::print(std::string path) const
+{
+    for(int i = 0; i < path.size() - 1; i++)
+    {
+        std::cout << path[i] << "->";
+    }
+    std::cout << path[path.size() - 1];
+}
+
 //main function demonstrating all functionalities
 void Game::start()
 {
-    try
-    {     
-        createRoomAndDrone();
+    createRoomAndDrone();    
+    if(droneWithAllPaths.countLeaves())
+    {
         visualize();
         mainFunctionalities();
-        additionallyFunctionalities();        
-    }
-    catch(const std::runtime_error& e)
+        firstAdditionallyFunctionalities();    
+        secondAdditionallyFunctionalities();
+    } 
+    else
     {
-        std::cout << e.what() << '\n';
-    }   
+        std::cout<< "No paths from Tom to Jerry!\n";
+    }       
 }

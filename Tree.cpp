@@ -103,7 +103,7 @@ void Tree::makeLegend(std::ostream& out) const
             "<tr><td align=\"right\" port=\"north\">North</td></tr>\n"
             "<tr><td align=\"right\" port=\"east\">East</td></tr>\n"
             "<tr><td align=\"right\" port=\"south\">South</td></tr>\n"
-            "<tr><td align=\"righ\" port=\"west\">West</td></tr>\n"
+            "<tr><td align=\"right\" port=\"west\">West</td></tr>\n"
             "<tr><td align=\"right\" port=\"paint\">Paint</td></tr>\n"
             "</table>>]\n"
         "key2 [label=<<table  border=\"0\" cellpadding=\"2\" cellspacing=\"0\" cellborder=\"0\">\n"

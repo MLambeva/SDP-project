@@ -64,9 +64,14 @@ void Room::putFurniture(int K, std::ifstream& input)
         int x = furn.x;
         int y = furn.y;
         char elem = input.get();
+        if((isCorrectSymbol({x,y}, 'F') || isCorrectSymbol({x,y}, 'S') && elem == '1'))
+        {
+            throw std::runtime_error ("Furniture cannot be outside the room or on Tom or Jerry!");
+        }
+        
         while(elem != '=')
         {
-            if(canBeLocated({x,y}))
+            if(canBeLocated({x,y}) || ((isCorrectSymbol({x,y}, 'F') || isCorrectSymbol({x,y}, 'S')) && elem == ' '))
             {
                 if(elem == '1')        
                 {
