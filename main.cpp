@@ -1,9 +1,9 @@
-#include "Game.h"
+#include "droneProgramming.h"
 
 int main()
-{   
-    Game game;
-    game.start();   
-
+{       
+    DroneProgramming drone;
+    drone.start();   
+  
     return 0;
 }

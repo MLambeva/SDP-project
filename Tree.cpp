@@ -2,15 +2,16 @@
 
 void Tree::clearHelper(Node* curr)
 {
-    if(curr)
+    if(!curr)
     {
-        clearHelper(curr->north);
-        clearHelper(curr->east);
-        clearHelper(curr->south);
-        clearHelper(curr->west);
-        clearHelper(curr->paint);
-        delete curr;
+        return;
     }
+    clearHelper(curr->north);
+    clearHelper(curr->east);
+    clearHelper(curr->south);
+    clearHelper(curr->west);
+    clearHelper(curr->paint);
+    delete curr;    
 }
 
 //According to direction symbol, function returns a pointer to next direction
@@ -35,14 +36,23 @@ Tree::Node*& Tree::findNextPosition(char x, Node*& curr)
 }
 
 //Creates next part of tree
-void Tree::createNextNode(char x, Node*& curr)
+void Tree::createNextNode(char x, std::string path, Node*& curr)
 {  
-    Node*& next = findNextPosition(x, curr);
-    if(!next)
+    if(path.front() == x)
     {
-        next = new Node{x};
+        Node*& next = findNextPosition(x, curr);
+        if(!next)
+        {
+            next = new Node{x};
+        }
+        curr = next;
     }
-    curr = next;
+    
+}
+
+bool Tree::isCorrectChar(char x) const
+{
+    return x == 'N' || x == 'E' || x == 'S' || x == 'W' || x == 'P';
 }
 
 //Creates the tail of tree
@@ -51,25 +61,13 @@ void Tree::createTailTree(std::string& path)
     Node* curr = start;
     while(path.size() > 0)
     {
-        if(path.front() == 'N')
+        if(isCorrectChar(path.front()))
         {
-            createNextNode('N', curr);
-        }
-        else if(path.front() == 'E')
-        {
-            createNextNode('E', curr);
-        }
-        else if(path.front() == 'S')
-        {
-            createNextNode('S', curr);
-        }
-        else if(path.front() == 'W')
-        {
-            createNextNode('W', curr);
-        }
-        else if(path.front() == 'P')
-        {
-            createNextNode('P', curr);
+            createNextNode('N', path, curr);
+            createNextNode('E', path, curr);
+            createNextNode('S', path, curr);
+            createNextNode('W', path, curr);
+            createNextNode('P', path, curr);
         }
         else
         {
@@ -121,7 +119,7 @@ void Tree::makeLegend(std::ostream& out) const
     "}\n}\n";
 }
 
-//print direction
+//Remove repeats for visualizing tree
 void Tree::removeRepeats (std::ostream& out, Node* pos, Node* direction, std::string color) const
 {
     if (direction)
@@ -203,6 +201,15 @@ void Tree::createIdToLeavesHelper(Node* curr, int& id)
    createIdToLeavesHelper(curr->paint, id);
 }
 
+//Helper function to add node to queue
+void Tree::addNodeToQueue(Node* direction, std::queue<Node*>& q)
+{
+    if(direction)
+    {
+        q.push(direction);
+    }
+}
+
 //We need to know if there is leaf with identifier 'id' in the subtree with root 'curr'
 bool Tree::isLeafWithIdInSubtree(Node* curr, const int& id) 
 {
@@ -210,15 +217,23 @@ bool Tree::isLeafWithIdInSubtree(Node* curr, const int& id)
     {
         return false;
     }
-    if(isLeaf(curr) && curr->idLeaf == id)
+    std::queue<Node*> q;
+    q.push(curr);
+    while(!q.empty())
     {
-        return true;
+        Node* saver = q.front();
+        q.pop();
+        if(isLeaf(saver) && saver->idLeaf == id)
+        {
+            return true;
+        }
+        addNodeToQueue(saver->north, q);
+        addNodeToQueue(saver->east, q);
+        addNodeToQueue(saver->south, q);
+        addNodeToQueue(saver->west, q);
+        addNodeToQueue(saver->paint, q);
     }
-    return isLeafWithIdInSubtree(curr->north, id)
-        || isLeafWithIdInSubtree(curr->east, id)
-        || isLeafWithIdInSubtree(curr->south, id)
-        || isLeafWithIdInSubtree(curr->west, id)
-        || isLeafWithIdInSubtree(curr->paint, id);
+    return false;
 }
 
 //According to 'id', function create path from root to leaf with this id

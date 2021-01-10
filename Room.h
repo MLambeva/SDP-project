@@ -4,7 +4,7 @@
 #include<string>
 #include<fstream>
 #include<iostream>
-#include "Position.h"
+#include"Position.h"
 
 class Room
 {
@@ -26,9 +26,6 @@ class Room
 
     void putFurniture(int K, std::ifstream& input);
     void placesForPaintSpill(int L, std::ifstream& input);
-    //function for removing repeats
-    void actionAfterCanStepOn(const Position& curr, char x, std::string path);
-    void createPossiblePathsHelper(const Position& curr, std::string& path);
 
     //Places 'x' in the room on position 'curr'
     void setElemInCurrPosition(const Position& curr, char x);
@@ -36,10 +33,17 @@ class Room
     bool isCorrectSymbol(const Position& curr, char x) const;
     bool canStepOn(const Position& other) const;
 
+    //function for removing repeats
+    void actionAfterCanStepOn(const Position& curr, char x, std::string path);
+    void createPossiblePathsHelper(const Position& curr, std::string& path);
+
     //Returns length of set path
     int lengthPath(std::string path) const;
     //Finds length of shortest path
     int lengthShortestPath() const;
+
+    //Prints room
+    void printRoom() const;  
 
     public:
     std::vector<std::string> getPossiblePaths() const;
@@ -50,10 +54,7 @@ class Room
     //Returns all possible paths for Tom to reach Jerry 
     std::vector<std::string> createAllPossiblePaths();
     //Returns the shortest possible paths for Tom to reach Jerry 
-    std::vector<std::string> createShortestPossiblePaths() const;
-          
-    //Prints room
-    void printRoom() const;    
+    std::vector<std::string> createShortestPossiblePaths() const;          
 };
 
 #endif

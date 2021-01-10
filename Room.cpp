@@ -12,7 +12,7 @@ void Room::resizeRoom(std::ifstream& input)
 {
     int width;
     input>>width;
-
+    
     int length;
     input>>length;
     //width - Ox(north->south)
@@ -59,38 +59,41 @@ void Room::putFurniture(int K, std::ifstream& input)
     for(int i = 0; i < K; i++)
     {
         Position furn;
-        furn.read(input);
-        input.get();
+        furn.read(input);//read northwest position of furniture
+        input.get();//new line
         int x = furn.x;
         int y = furn.y;
         char elem = input.get();
-        if((isCorrectSymbol({x,y}, 'F') || isCorrectSymbol({x,y}, 'S') && elem == '1'))
+        //Check if can put furniture
+        if(!canBeLocated({x,y}) || (isCorrectSymbol({x,y}, 'F') || isCorrectSymbol({x,y}, 'S') && elem == '1'))
         {
             throw std::runtime_error ("Furniture cannot be outside the room or on Tom or Jerry!");
         }
-        
+        //"===" mark the end ot furniture
         while(elem != '=')
         {
+            /*If we have furniture with shape 11
+                                              _1, where _ is empty space, Tom and Jerry can be located there.*/
             if(canBeLocated({x,y}) || ((isCorrectSymbol({x,y}, 'F') || isCorrectSymbol({x,y}, 'S')) && elem == ' '))
             {
                 if(elem == '1')        
                 {
                     setElemInCurrPosition({x,y}, '1');                  
-                    y++;                   
+                    y++;//We go right
                 }
                 else if(elem == ' ')
                 {
-                    y++;
+                    y++;//We go right
                 }
                 else
                 {
                     throw std::runtime_error("Invalid symbol in the definition of furniture!");
                 }
                 elem = input.get();
-                if(elem == '\n')
+                if(elem == '\n')//if we have new line, we should go down.
                 {
                     x++;
-                    y = furn.y;
+                    y = furn.y;//y position should be northwest position of furniture again
                     elem = input.get();
                 }
             }
@@ -99,7 +102,7 @@ void Room::putFurniture(int K, std::ifstream& input)
                 throw std::runtime_error ("Furniture cannot be outside the room or on Tom or Jerry!");
             }           
         }
-        if(input.get() != '=' || input.get() != '=')
+        if(input.get() != '=' || input.get() != '=')//Check if end of furniture is correct
         {
             throw std::runtime_error("Invalid end of furniture!");
         }
@@ -107,7 +110,7 @@ void Room::putFurniture(int K, std::ifstream& input)
 }
 
 void Room::placesForPaintSpill(int L, std::ifstream& input)
-{
+{    
     for(int i = 0; i < L; i++)
     {
         Position help;
@@ -120,7 +123,7 @@ void Room::placesForPaintSpill(int L, std::ifstream& input)
         {
             throw std::runtime_error ("Cannot spill paint on that position!");
         }        
-    }
+    } 
 }
 
 //Places 'x' in the room on position 'curr'
@@ -223,6 +226,20 @@ int Room::lengthShortestPath() const
     return helper;
 }
 
+void Room::printRoom() const
+{
+    std::cout<<'\n';
+    for (std::vector<char> v : room) 
+    {
+        for (char c : v) 
+        {
+            std::cout << c << " ";
+        }
+        std::cout << '\n';
+    }
+    std::cout << '\n';
+}
+
 std::vector<std::string> Room::getPossiblePaths() const
 {
     return possiblePaths;
@@ -247,9 +264,17 @@ void Room::createRoom(std::string filePath)
     input >> K;
     int L;//number of paint spill positions
     input >> L;
-    putFurniture(K, input);
-    placesForPaintSpill(L, input);   
-    printRoom();
+    putFurniture(K, input);  
+    placesForPaintSpill(L, input);  
+    input.get();
+    if(input.eof())
+    {
+        printRoom();
+    } 
+    else
+    {
+        throw std::runtime_error ("Invalid input!");
+    }   
     input.close();   
 }
 
@@ -274,18 +299,4 @@ std::vector<std::string> Room::createShortestPossiblePaths() const
         }
     }
     return shortestPosPaths;
-}
-
-void Room::printRoom() const
-{
-    std::cout<<'\n';
-    for (std::vector<char> v : room) 
-    {
-        for (char c : v) 
-        {
-            std::cout << c << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
 }
